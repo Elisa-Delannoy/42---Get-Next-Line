@@ -12,7 +12,6 @@
 
 #include "get_next_line.h"
 
-
 size_t	ft_strlen(const char *s)
 {
 	size_t	i;
@@ -44,14 +43,11 @@ char	*ft_strjoin(char const *s1, char const *s2)
 			i++;
 		}
 	}
-	j = 0;
+	j = -1;
 	if (s2 != NULL)
 	{
-		while (s2[j])
-		{
+		while (s2[++j])
 			new[i + j] = s2[j];
-			j++;
-		}
 	}
 	new [i + j] = '\0';
 	return (new);
@@ -59,17 +55,16 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 char	*ft_strchr(const char *s, int c)
 {
-	if (s != NULL)
+	if (s == NULL)
+		return (NULL);
+	while (*s)
 	{
-		while (*s)
-		{
-			if (*s == (char)c)
-				return ((char *)s);
-			s++;
-		}
-		if ((char)c == '\0')
+		if (*s == (char)c)
 			return ((char *)s);
+		s++;
 	}
+	if ((char)c == '\0')
+		return ((char *)s);
 	return (NULL);
 }
 
@@ -79,9 +74,9 @@ char	*ft_strdup(const char *s)
 	int		i;
 
 	new = malloc((ft_strlen(s) + 1) * sizeof(char));
-	i = 0;
 	if (new == NULL)
 		return (NULL);
+	i = 0;
 	if (s != NULL)
 	{
 		while (s[i])

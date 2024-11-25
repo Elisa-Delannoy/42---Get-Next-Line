@@ -12,11 +12,12 @@
 
 #include "get_next_line.h"
 
-
 char	*ft_temp(char *newbuffer, char *buffer, int i)
 {
 	char	*temp;
-	
+
+	// if (newbuffer == NULL)
+	// 	return (NULL);
 	if (i < 0)
 	{
 		temp = ft_strjoin(newbuffer, buffer);
@@ -29,6 +30,8 @@ char	*ft_temp(char *newbuffer, char *buffer, int i)
 		free(newbuffer);
 		newbuffer = temp;
 	}
+	if (newbuffer == NULL)
+		return (NULL);
 	return (newbuffer);
 }
 
@@ -37,120 +40,74 @@ char	*ft_read(int fd, char *buffer, char *newbuffer)
 	int	m;
 
 	m = 1;
-	buffer[0] = '\0';
+	// buffer[0] = '\0';
+
 	while (m > 0 && ft_strchr(newbuffer, '\n') == NULL)
 	{
 		m = read (fd, buffer, BUFFER_SIZE);
 		if (m == -1)
 		{
 			free(newbuffer);
-			return (0);	
+			return (0);
 		}
 		buffer[m] = '\0';
 		newbuffer = ft_temp(newbuffer, buffer, -1);
 	}
+	if (m == 0 && !newbuffer)
+	{
+		free(newbuffer);	
+		return (NULL);
+	}
 	return (newbuffer);
 }
 
-
 char	*get_next_line(int fd)
 {
-	char 		buffer[BUFFER_SIZE + 1];
+	char		buffer[BUFFER_SIZE + 1];
 	static char	*newbuffer = NULL;
-	char 		*content;
+	char		*content;
 	int			i;
 
+	buffer[0] = '\0';
 	newbuffer = ft_read(fd, buffer, newbuffer);
 	content = malloc ((ft_strlen(newbuffer) + 1) * sizeof(char));
-	if (content == NULL)
+	if (content == NULL || newbuffer == NULL)
+	{
+		free (newbuffer);
 		return (NULL);
-	i = -1;
+	}
+	i = - 1;
 	while (newbuffer[++i] && newbuffer[i] != '\n')
 		content[i] = newbuffer[i];
-	if (newbuffer[i] == '\n') 
+	if (newbuffer[i] == '\n') /*|| newbuffer[i] == '\0')*/
 	{
 		newbuffer = ft_temp(newbuffer, newbuffer, i);
+		content[i] = '\n';
 		return (content);
 	}
-	if (newbuffer[i] == '\0')
-	{
-		return (content);
-	}
-	return (NULL);
+	content[++i] = '\0';
+	// if (newbuffer[i] == '\0')
+	// {
+	// 	// free (newbuffer);
+	// 	return (content);
+
+	// free (content);
+	return (content);
 }
-	
-	// printf("content =%s\n", content);
-	// printf("buffer = %s\n", newbuffer);
 
+// # include <sys/types.h>
+// # include <sys/stat.h>
+// # include <fcntl.h>
 
-
-
-
-
-// char	*get_next_line(int fd)
+// int	main()
 // {
-// 	static char	*newbuffer = NULL;
+// 	int fd = open ("test.txt", O_RDONLY);
+// 	int i = 0;
 
-
-
-
+// 	while (i < 3)
+// 	{
+// 		printf("i = %i line = %s\n", i , get_next_line(fd));
+// 		i++;
+// 	}
+// 	close (fd);
 // }
-
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-
-
-// int main() 
-// {
-//     int fd = open("test.txt", O_RDONLY);
-//     if (fd == -1) {
-//         perror("Erreur lors de l'ouverture du fichier");
-//         return 1;
-//     }
-
-//     // Lecture ligne par ligne avec get_next_line
-//     char *line;
-//     while ((line = get_next_line(fd)) != NULL) {
-//         printf("%s", line);  // Affiche la ligne lue
-//         free(line);  // Libère la mémoire allouée pour la ligne
-//     }
-
-//     // Si la lecture est terminée ou en cas d'erreur
-//     if (line == NULL) {
-//         printf("Fin du fichier ou erreur de lecture\n");
-//     }
-
-//     close(fd);  // Ferme le fichier après l'utilisation
-//     return 0;
-// }
-
-int	main()
-{
-	int fd = open ("test.txt", O_RDONLY);
-	
-	int i = 0;
-
-	while (i < 3)
-	{
-		printf("i = %i line = %s\n", i , get_next_line(fd));
-		i++;
-	}
-	// printf("test join%s", ft_strjoin("hello", "bonjour"));
-	close (fd);
-}
-	
-// 	return (0);
-// }
-	
-		
-
-// 	return (0);
-// }
-
-
-
-
-
-
-
