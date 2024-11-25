@@ -72,3 +72,24 @@ char	*ft_strchr(const char *s, int c)
 	}
 	return (NULL);
 }
+
+char	*ft_strdup(const char *s)
+{
+	char	*new;
+	int		i;
+
+	new = malloc((ft_strlen(s) + 1) * sizeof(char));
+	i = 0;
+	if (new == NULL)
+		return (NULL);
+	if (s != NULL)
+	{
+		while (s[i])
+		{
+			new[i] = s[i];
+			i++;
+		}
+	}
+	new[i] = '\0';
+	return (new);
+}

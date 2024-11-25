@@ -12,59 +12,74 @@
 
 #include "get_next_line.h"
 
-int	ft_read(int fd)
+char	*ft_read(int fd)
 {
-	char 		*buffer; /*voir avec alain [BUFFER_SIZE + 1] dans while*/
+	char 		buffer[BUFFER_SIZE + 1];
 	int 		m;
 	static char	*newbuffer = NULL;
 	char		*temp;
+	char 		*content;
+	int			i;
 
 	
-	buffer = malloc ((BUFFER_SIZE + 1) * sizeof(char));
-	if (buffer == NULL)
-		return (0);
+	// buffer = malloc ((BUFFER_SIZE + 1) * sizeof(char));
+	// if (buffer == NULL)
+	// 	return (0);
 
 
-	m = read (fd, buffer, BUFFER_SIZE);
-	if (m == -1)
+	// m = read (fd, buffer, BUFFER_SIZE);
+	// if (m == -1)
+	// {
+	// 	free(buffer);
+	// 	return (0);		
+	// }
+
+	// printf("buffer init=%s\n", buffer);
+	// temp = ft_strjoin(newbuffer, buffer);
+	// free (newbuffer);
+	// newbuffer = temp;
+	// printf("newbuffer init=%s\n", newbuffer);
+	m = 1;
+	buffer[0] = '\0';
+	while (m > 0 && ft_strchr(newbuffer, '\n') == NULL)
 	{
-		free(buffer);
-		return (0);		
-	}
-
-	printf("buffer init=%s\n", buffer);
-	temp = ft_strjoin(newbuffer, buffer);
-	free (newbuffer);
-	newbuffer = temp;
-	printf("newbuffer init=%s\n", newbuffer);
-
-	
-
-
-	printf("buffer init=%s\n", newbuffer);
-	while (m > 0 && ft_strchr(buffer, '\n') == NULL)
-	{
-		free (buffer);
-		buffer = malloc ((BUFFER_SIZE + 1) * sizeof(char));
-		if (buffer == NULL)
-		{
-			free (newbuffer);
-			return (0);
-		}
 		m = read (fd, buffer, BUFFER_SIZE);
+		buffer[m] = '\0';
+		// printf("buffer apres boulce =%s\n", buffer);
 		if (m == -1)
 		{
-			free(buffer);
 			free(newbuffer);
-			return (0);	
+			return (NULL);	
 		}
-		printf("buffer boulce =%s\n", newbuffer);
 		temp = ft_strjoin(newbuffer, buffer);
 		free (newbuffer);
 		newbuffer = temp;
+		// printf("newbuffer boulce =%s\n", newbuffer);
+	}	
+	
+	content = malloc ((ft_strlen(newbuffer) + 1) * sizeof(char));
+	if (content == NULL)
+		return (NULL);
+	i = 0;
+	while (newbuffer[i] && newbuffer[i] != '\n')
+	{
+		content[i] = newbuffer[i];
+		i++;
 	}
-	free (buffer);	
-	return (m);
+	// printf("content  =%s\n", content);
+	if (newbuffer[i] == '\n' ||	!newbuffer[i])
+	{
+		newbuffer = ft_strdup(newbuffer + i + 1);
+		printf("newbuffer raz =%s\n", newbuffer);
+		return (content);
+	}
+	if (m == 0)
+		return (NULL);
+		
+
+	// printf("content =%s\n", content);
+	// printf("buffer = %s\n", newbuffer);
+	return (NULL);
 }
 
 
@@ -72,30 +87,10 @@ int	ft_read(int fd)
 // char	*get_next_line(int fd)
 // {
 // 	static char	*newbuffer = NULL;
-// 	char 		*content;
-// 	int			i;
 	
 	
-// 	newbuffer = ft_strjoin(newbuffer, buffer);
-// 	content = malloc ((ft_strlen(newbuffer) + 1) * sizeof(char));
-// 	i = 0;
-// 	while (newbuffer[i] && newbuffer[i] != '\n')
-// 	{
-// 		content[i] = newbuffer[i];
-// 		i++;
-// 	}
-// 	if (newbuffer[i] == '\n' ||	!newbuffer[i])
-// 	{
-// 		newbuffer = (newbuffer + i);
-// 		return (content);
-// 	}
-// 	if (m == 0)
-// 		return (NULL);
-		
-
-// 	printf("content =%s\n", buffer);
-// 	printf("buffer = %s\n", buffer);
-// 	return (0);
+	
+	
 // }
 
 # include <sys/types.h>
@@ -131,20 +126,21 @@ int	main()
 {
 	int fd = open ("test.txt", O_RDONLY);
 	
-	int a = ft_read (fd);
-	printf("%d\n", a);
+	int i = 0;
+
+	while (i < 3)
+	{
+		printf("i = %i line = %s\n", i , ft_read (fd));
+		i++;
+	}
 	// printf("test join%s", ft_strjoin("hello", "bonjour"));
 	close (fd);
 }
 	
 // 	return (0);
 // }
-	// int i = 0;
-
-	// while (i < 4)
-	// {
+	
 		
-		// i++;
-	// }
+
 // 	return (0);
 // }
