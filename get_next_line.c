@@ -12,85 +12,88 @@
 
 #include "get_next_line.h"
 
-char	*ft_read(int fd)
+
+char	*ft_temp(char *newbuffer, char *buffer, int i)
 {
-	char 		buffer[BUFFER_SIZE + 1];
-	int 		m;
-	static char	*newbuffer = NULL;
-	char		*temp;
-	char 		*content;
-	int			i;
-
+	char	*temp;
 	
-	// buffer = malloc ((BUFFER_SIZE + 1) * sizeof(char));
-	// if (buffer == NULL)
-	// 	return (0);
+	if (i < 0)
+	{
+		temp = ft_strjoin(newbuffer, buffer);
+		free (newbuffer);
+		newbuffer = temp;
+	}
+	if (i >= 0)
+	{
+		temp = ft_strdup(newbuffer + i + 1);
+		free(newbuffer);
+		newbuffer = temp;
+	}
+	return (newbuffer);
+}
 
+char	*ft_read(int fd, char *buffer, char *newbuffer)
+{
+	int	m;
 
-	// m = read (fd, buffer, BUFFER_SIZE);
-	// if (m == -1)
-	// {
-	// 	free(buffer);
-	// 	return (0);		
-	// }
-
-	// printf("buffer init=%s\n", buffer);
-	// temp = ft_strjoin(newbuffer, buffer);
-	// free (newbuffer);
-	// newbuffer = temp;
-	// printf("newbuffer init=%s\n", newbuffer);
 	m = 1;
 	buffer[0] = '\0';
 	while (m > 0 && ft_strchr(newbuffer, '\n') == NULL)
 	{
 		m = read (fd, buffer, BUFFER_SIZE);
-		buffer[m] = '\0';
-		// printf("buffer apres boulce =%s\n", buffer);
 		if (m == -1)
 		{
 			free(newbuffer);
-			return (NULL);	
+			return (0);	
 		}
-		temp = ft_strjoin(newbuffer, buffer);
-		free (newbuffer);
-		newbuffer = temp;
-		// printf("newbuffer boulce =%s\n", newbuffer);
-	}	
-	
+		buffer[m] = '\0';
+		newbuffer = ft_temp(newbuffer, buffer, -1);
+	}
+	return (newbuffer);
+}
+
+
+char	*get_next_line(int fd)
+{
+	char 		buffer[BUFFER_SIZE + 1];
+	static char	*newbuffer = NULL;
+	char 		*content;
+	int			i;
+
+	newbuffer = ft_read(fd, buffer, newbuffer);
 	content = malloc ((ft_strlen(newbuffer) + 1) * sizeof(char));
 	if (content == NULL)
 		return (NULL);
-	i = 0;
-	while (newbuffer[i] && newbuffer[i] != '\n')
-	{
+	i = -1;
+	while (newbuffer[++i] && newbuffer[i] != '\n')
 		content[i] = newbuffer[i];
-		i++;
-	}
-	// printf("content  =%s\n", content);
-	if (newbuffer[i] == '\n' ||	!newbuffer[i])
+	if (newbuffer[i] == '\n') 
 	{
-		newbuffer = ft_strdup(newbuffer + i + 1);
-		printf("newbuffer raz =%s\n", newbuffer);
+		newbuffer = ft_temp(newbuffer, newbuffer, i);
 		return (content);
 	}
-	if (m == 0)
-		return (NULL);
-		
-
-	// printf("content =%s\n", content);
-	// printf("buffer = %s\n", newbuffer);
+	if (newbuffer[i] == '\0')
+	{
+		return (content);
+	}
 	return (NULL);
 }
+	
+	// printf("content =%s\n", content);
+	// printf("buffer = %s\n", newbuffer);
+
+
+
 
 
 
 // char	*get_next_line(int fd)
 // {
 // 	static char	*newbuffer = NULL;
-	
-	
-	
-	
+
+
+
+
 // }
 
 # include <sys/types.h>
@@ -130,7 +133,7 @@ int	main()
 
 	while (i < 3)
 	{
-		printf("i = %i line = %s\n", i , ft_read (fd));
+		printf("i = %i line = %s\n", i , get_next_line(fd));
 		i++;
 	}
 	// printf("test join%s", ft_strjoin("hello", "bonjour"));
@@ -144,3 +147,10 @@ int	main()
 
 // 	return (0);
 // }
+
+
+
+
+
+
+

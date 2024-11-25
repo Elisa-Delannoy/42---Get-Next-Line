@@ -44,9 +44,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 			i++;
 		}
 	}
+	j = 0;
 	if (s2 != NULL)
 	{
-		j = 0;
 		while (s2[j])
 		{
 			new[i + j] = s2[j];
