@@ -21,13 +21,15 @@ char	*ft_temp(char *newbuffer, char *buffer, int i)
 	if (i < 0)
 	{
 		temp = ft_strjoin(newbuffer, buffer);
-		free (newbuffer);
+		if (newbuffer != NULL)
+			free (newbuffer);
 		newbuffer = temp;
 	}
 	if (i >= 0)
 	{
 		temp = ft_strdup(newbuffer + i + 1);
-		free(newbuffer);
+		if (newbuffer != NULL)
+			free(newbuffer);
 		newbuffer = temp;
 	}
 	if (newbuffer == NULL)
@@ -40,24 +42,24 @@ char	*ft_read(int fd, char *buffer, char *newbuffer)
 	int	m;
 
 	m = 1;
-	// buffer[0] = '\0';
-
-	while (m > 0 && ft_strchr(newbuffer, '\n') == NULL)
+	while (m != 0 && ft_strchr(newbuffer, '\n') == NULL)
 	{
 		m = read (fd, buffer, BUFFER_SIZE);
 		if (m == -1)
 		{
-			free(newbuffer);
-			return (0);
+			if (newbuffer != NULL)
+				free(newbuffer);
+			return (NULL);
 		}
 		buffer[m] = '\0';
 		newbuffer = ft_temp(newbuffer, buffer, -1);
 	}
-	if (m == 0 && !newbuffer)
-	{
-		free(newbuffer);	
-		return (NULL);
-	}
+	buffer[0] = '\0';
+	// if (m == 0)
+	// {
+	// 	free(newbuffer);
+	// 	return (NULL);
+	// }
 	return (newbuffer);
 }
 
@@ -70,9 +72,12 @@ char	*get_next_line(int fd)
 
 	buffer[0] = '\0';
 	newbuffer = ft_read(fd, buffer, newbuffer);
-	content = malloc ((ft_strlen(newbuffer) + 1) * sizeof(char));
+	// if (newbuffer == NULL)
+	// 	return (NULL);
+	content = ft_calloc ((ft_strlen(newbuffer) + 1), sizeof(char));
 	if (content == NULL || newbuffer == NULL)
 	{
+		free (content);
 		free (newbuffer);
 		return (NULL);
 	}
@@ -83,15 +88,11 @@ char	*get_next_line(int fd)
 	{
 		newbuffer = ft_temp(newbuffer, newbuffer, i);
 		content[i] = '\n';
-		return (content);
+		i++;
 	}
-	content[++i] = '\0';
-	// if (newbuffer[i] == '\0')
-	// {
-	// 	// free (newbuffer);
-	// 	return (content);
+	content[i] = '\0';
 
-	// free (content);
+	
 	return (content);
 }
 
