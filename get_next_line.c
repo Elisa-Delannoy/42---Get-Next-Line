@@ -12,12 +12,23 @@
 
 #include "get_next_line.h"
 
+size_t	ft_strlen(const char *s)
+{
+	size_t	i;
+
+	i = 0;
+	if (s != NULL)
+	{
+		while (s[i])
+			i++;
+	}
+	return (i);
+}
+
 char	*ft_temp(char **newbuffer, char *buffer, int i)
 {
 	char	*temp;
 
-	// if (newbuffer == NULL)
-	// 	return (NULL);
 	if (i < 0)
 	{
 		temp = ft_strjoin(*newbuffer, buffer);
@@ -46,18 +57,7 @@ char	*ft_read(int fd, char *buffer, char **newbuffer)
 	int	m;
 
 	m = 1;
-	if (m == 0 && *newbuffer[0] == '\0')
-	{
-		free (*newbuffer);
-		return (NULL);
-	}
-	// if (m == -1)
-	// {
-	// 	if (*newbuffer != NULL)
-	// 		free(*newbuffer);
-	// 	return (NULL);
-	// }
-	while (m > 0 && ft_strchr(*newbuffer, '\n') == NULL)
+	while (m != 0 && ft_strchr(*newbuffer, '\n') == NULL)
 	{
 		m = read (fd, buffer, BUFFER_SIZE);
 		if (m == -1)
@@ -69,8 +69,13 @@ char	*ft_read(int fd, char *buffer, char **newbuffer)
 		buffer[m] = '\0';
 		*newbuffer = ft_temp(newbuffer, buffer, -1);
 	}
-	// if (m == 0 && *newbuffer && *newbuffer[0] != '\0')
-	// 	return (*newbuffer);
+	if (m == 0 && *newbuffer[0] == '\0')
+	{
+		free (*newbuffer);
+		return (NULL);
+	}
+	if (m == 0 && *newbuffer && *newbuffer[0] != '\0')
+		return (*newbuffer);
 	return (*newbuffer);
 }
 
@@ -87,27 +92,18 @@ char	*get_next_line(int fd)
 		return (NULL);
 	content = ft_calloc ((ft_strlen(newbuffer) + 1), sizeof(char));
 	if (content == NULL)
-	{
-		// free (content);
-		free (newbuffer);
-		return (NULL);
-	}
-	i = - 1;
+		return (free(newbuffer), NULL);
+	i = -1;
 	while (newbuffer[++i] && newbuffer[i] != '\n')
 		content[i] = newbuffer[i];
-	if (newbuffer[i] == '\n') /*|| newbuffer[i] == '\0')*/
+	if (newbuffer[i] == '\0')
+		newbuffer = ft_temp(&newbuffer, newbuffer, i - 1);
+	else if (newbuffer[i] == '\n')
 	{
 		newbuffer = ft_temp(&newbuffer, newbuffer, i);
-		content[i] = '\n';
-		i++;
+		content[i++] = '\n';
 	}
-	content[i] = '\0';
-	// if (newbuffer[0] == '\0')
-	// {
-	// 	free(newbuffer);
-	// 	newbuffer = NULL;
-	// }
-	return (content);
+	return (content[i] = '\0', content);
 }
 
 // # include <sys/types.h>
@@ -116,23 +112,21 @@ char	*get_next_line(int fd)
 
 // int main()
 // {
-//     int fd = open("test.txt", O_RDONLY); // Ouvrir le fichier en lecture seule
+//     int fd = open("test.txt", O_RDONLY); 
 //     int i = 0;
 
-//     while (i < 3)
+//     while (i < 6)
 //     {
-//         char *line = get_next_line(fd); // Lire une ligne
+//         char *line = get_next_line(fd); 
 //         if (line) {
 //             printf("i = %i line = %s\n", i, line);
-//             free(line); // Libérer la mémoire de la ligne après utilisation
+//             free(line);
 //         }
 //         i++;
 //     }
 //     close(fd); // Fermer le fichier
 //     return 0;
 // }
-
-
 // int	main()
 // {
 // 	int fd = open ("test.txt", O_RDONLY);
