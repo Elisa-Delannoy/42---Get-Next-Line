@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlen(const char *s)
 {
@@ -82,25 +82,25 @@ char	*ft_read(int fd, char *buffer, char **newbuffer)
 char	*get_next_line(int fd)
 {
 	char		buffer[BUFFER_SIZE + 1];
-	static char	*newbuffer = NULL;
+	static char	*newbuffer[1024];
 	char		*content;
 	int			i;
 
 	buffer[0] = '\0';
-	newbuffer = ft_read(fd, buffer, &newbuffer);
-	if (newbuffer == NULL)
+	newbuffer[fd] = ft_read(fd, buffer, &newbuffer[fd]);
+	if (newbuffer[fd] == NULL)
 		return (NULL);
-	content = ft_calloc ((ft_strlen(newbuffer) + 1), sizeof(char));
+	content = ft_calloc ((ft_strlen(newbuffer[fd]) + 1), sizeof(char));
 	if (content == NULL)
-		return (free(newbuffer), NULL);
+		return (free(newbuffer[fd]), NULL);
 	i = -1;
-	while (newbuffer[++i] && newbuffer[i] != '\n')
-		content[i] = newbuffer[i];
-	if (newbuffer[i] == '\0')
-		newbuffer = ft_temp(&newbuffer, newbuffer, i - 1);
-	else if (newbuffer[i] == '\n')
+	while (newbuffer[fd][++i] && newbuffer[fd][i] != '\n')
+		content[i] = newbuffer[fd][i];
+	if (newbuffer[fd][i] == '\0')
+		newbuffer[fd] = ft_temp(&newbuffer[fd], buffer, i - 1);
+	else if (newbuffer[fd][i] == '\n')
 	{
-		newbuffer = ft_temp(&newbuffer, newbuffer, i);
+		newbuffer[fd] = ft_temp(&newbuffer[fd], buffer, i);
 		content[i++] = '\n';
 	}
 	return (content[i] = '\0', content);
@@ -112,19 +112,23 @@ char	*get_next_line(int fd)
 
 // int main()
 // {
-//     int fd = open("test.txt", O_RDONLY); 
+//     int fd = open("test.txt", O_RDONLY);
+// 	int	fd1 = open("test1.txt", O_RDONLY);
 //     int i = 0;
 
 //     while (i < 6)
 //     {
-//         char *line = get_next_line(fd); 
-//         if (line) {
+//         char *line = get_next_line(fd);
+// 		char *line1 = get_next_line(fd1); 
+//         if (line) 
+// 		{
 //             printf("i = %i line = %s\n", i, line);
+// 			printf("i = %i line = %s\n", i, line1);
 //             free(line);
+// 			free(line1);
 //         }
 //         i++;
 //     }
 //     close(fd);
 //     return 0;
 // }
-

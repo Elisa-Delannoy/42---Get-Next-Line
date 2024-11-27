@@ -1,6 +1,0 @@
-ceci est un test
-aller a la ligne    go
-ligne
-
-0123456789012345678901234567890123456789
-0
